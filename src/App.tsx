@@ -1,37 +1,27 @@
-import "./App.css";
-import { Link, Routes, Route, useRoutes } from "react-router-dom";
-import Home from "./components/Home";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import NotFound from "./components/NotFound";
-import BookRoutes from "./routes/BookRoutes";
-import NavLayouts from "./components/Layouts/NavLayouts";
-import About from "./components/About";
-import Contact from "./components/Contact";
+import BlogLayout from "./pages/BlogLayout";
+import BlogPostsPage from "./pages/BlogPosts";
+import NewPostPage from "./pages/NewPost";
+import PostDetailPage from "./pages/PostDetail";
+import RootLayout from "./components/RootLayout";
+import WelcomePage from "./pages/Welcome";
 
 function App() {
-  const routes = useRoutes([
-    {
-      path: "/",
-      element: <NavLayouts />,
-      children: [
-        {
-          index: true,
-          element: <Home />,
-        },
-        {
-          path: "/about",
-          element: <About />,
-        },
-        {
-          path: "/contact",
-          element: <Contact />,
-        },
-      ],
-    },
-    { path: "/books/*", element: <BookRoutes /> },
-    { path: "*", element: <NotFound /> },
-  ]);
-  return <div>{routes}</div>;
+  return (
+    <BrowserRouter>
+      <RootLayout>
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/blog" element={<BlogLayout />}>
+            <Route index element={<BlogPostsPage />} />
+            <Route path=":id" element={<PostDetailPage />} />
+          </Route>
+          <Route path="/blog/new" element={<NewPostPage />} />
+        </Routes>
+      </RootLayout>
+    </BrowserRouter>
+  );
 }
 
 export default App;
