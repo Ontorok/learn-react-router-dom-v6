@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Posts from "../components/Posts";
 import { getPosts } from "../util/api";
+import { sleep } from "../util/common";
 
 function BlogPostsPage() {
   const [error, setError] = useState();
@@ -23,10 +24,14 @@ function BlogPostsPage() {
     loadPosts();
   }, []);
 
+  const PreLoader = () => (
+    <div className="flex justify-center items-center">Loading...</div>
+  );
+
   return (
     <>
       <h1>Our Blog Posts</h1>
-      {isLoading && <p>Loading posts...</p>}
+      {isLoading && <PreLoader />}
       {error && <p>{error}</p>}
       {!error && posts && <Posts blogPosts={posts} />}
     </>
