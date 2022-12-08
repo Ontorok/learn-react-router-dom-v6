@@ -1,16 +1,22 @@
-import { useEffect, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useEffect, useState, Suspense } from "react";
+import { defer, useLoaderData, Await } from "react-router-dom";
 
 import Posts from "../components/Posts";
 import { getPosts } from "../util/api";
-import { sleep } from "../util/common";
 
 function BlogPostsPage() {
-  const posts = useLoaderData();
+  const loaderdata = useLoaderData() as { post: any };
   return (
     <>
       <h1>Our Blog Posts</h1>
-      <Posts blogPosts={posts} />
+      <Suspense fallback={<p>Loading...</p>}>
+        <Await
+          resolve={loaderdata.post}
+          errorElement={<p>Error loading blog post</p>}
+        >
+          {(posts) => <Posts blogPosts={posts} />}
+        </Await>
+      </Suspense>
     </>
   );
 }
@@ -18,5 +24,5 @@ function BlogPostsPage() {
 export default BlogPostsPage;
 
 export function loader() {
-  return getPosts();
+  return defer({ post: getPosts() });
 }

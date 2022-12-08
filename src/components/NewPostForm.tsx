@@ -1,16 +1,15 @@
+import { Form } from "react-router-dom";
 import classes from "./NewPostForm.module.css";
 
 function NewPostForm({
   onCancel,
-  onSubmit,
   submitting,
 }: {
   onCancel: any;
-  onSubmit: any;
   submitting: any;
 }) {
   return (
-    <form className={classes.form} onSubmit={onSubmit}>
+    <Form className={classes.form} method="post" action="/blog/new">
       <fieldset>
         <label htmlFor="title">Title</label>
         <input id="title" type="text" name="title" required minLength={5} />
@@ -31,7 +30,7 @@ function NewPostForm({
       <button disabled={submitting}>
         {submitting ? "Submitting..." : "Create Post"}
       </button>
-    </form>
+    </Form>
   );
 }
 

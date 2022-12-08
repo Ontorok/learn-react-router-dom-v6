@@ -1,30 +1,18 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  redirect,
+  useActionData,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 
 import NewPostForm from "../components/NewPostForm";
 import { savePost } from "../util/api";
+import { ErrorTypePorps } from "./ErrorPage";
 
 function NewPostPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<any>();
+  const actionData = useActionData() as ErrorTypePorps;
   const navigate = useNavigate();
-
-  async function submitHandler(event: any) {
-    event.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData(event.target);
-      const post = {
-        title: formData.get("title"),
-        body: formData.get("post-text"),
-      };
-      await savePost(post);
-      navigate("/");
-    } catch (err: any) {
-      setError(err);
-    }
-    setIsSubmitting(false);
-  }
+  const navigation = useNavigation();
 
   function cancelHandler() {
     navigate("/blog");
@@ -32,14 +20,32 @@ function NewPostPage() {
 
   return (
     <>
-      {error && <p>{error.message}</p>}
+      {actionData && actionData.status && <p>{actionData.message}</p>}
       <NewPostForm
         onCancel={cancelHandler}
-        onSubmit={submitHandler}
-        submitting={isSubmitting}
+        submitting={navigation.state === "submitting"}
       />
     </>
   );
 }
 
 export default NewPostPage;
+
+export async function action({ request }: any) {
+  const formData = await request.formData();
+  const post = {
+    title: formData.get("title"),
+    body: formData.get("post-text"),
+  };
+  try {
+    await savePost(post);
+  } catch (err: any) {
+    if (err.status === 422) {
+      // tbd
+      return err;
+    }
+    throw err;
+  }
+
+  return redirect("/blog");
+}
